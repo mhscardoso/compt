@@ -1,17 +1,26 @@
+#include <iostream>
+#include <sstream>
+
 #include "001/lib.h"
 
+void divide() {
+	cout << "----------------------------------" << endl;
+}
+
 int main(void) {
-	PilhaInt p;
 
-	p << 2 << 7 << 10 << 9238 << 6;
-
-	cout << p << endl;
-
-	int e = p.desempilha();
-	cout << "Desempilhou " << e << endl;
-
-	e = p.desempilha();
-	cout << "Desempilhou " << e << endl;
-
-	cout << p << endl;
+	teste1();
+	divide();
+	
+	teste2();
+	divide();
+	
+	teste3();
+	divide();
+	
+	teste4();
+	divide();
+	
+	teste5();
+	divide();
 }

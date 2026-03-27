@@ -1,5 +1,3 @@
-#include <iostream>
-
 using namespace std;
 
 const int MAX_PILHA = 100;
@@ -45,26 +43,80 @@ public:
 		return *this;
 	}
 
-
-	friend ostream& operator<<(ostream& os, const PilhaInt& p);
-
-
-	void show() {
-		cout << "[";
+	void print(ostream& os) const {
+		os << "[";
 		for (int i = 0; i < topo; i++) {
-			cout << " " << arr[i];
+			os << " " << arr[i];
+			if (i < topo - 1) {
+				os << ",";
+			}
 		}
-		cout << " ]" << endl;
+		os << " ]";
+	}
+
+	PilhaInt& operator=(const PilhaInt& p) {
+
+		while (this->topo > 0) {
+			this->desempilha();
+		}
+
+		for (int i = 0; i < p.getTopo(); i++) {
+			this->empilha(p.get(i));
+		}
+
+		return *this;
 	}
 };
 
 
-ostream& operator<<(ostream& os, const PilhaInt& p) {
-	os << "[";
-	for (int i = 0; i < p.getTopo(); i++) {
-		os << " " << p.get(i);
-	}
-	os << " ]";
+void teste1() {
+	PilhaInt p;
+	p.empilha( 1 );
+	p.empilha( 2 );
+	cout << p.desempilha() << endl;
+	cout << p.desempilha() << endl;
+}
 
-	return os;
+void teste2() {
+	PilhaInt p;
+	p << 19 << 18 << 17;
+	p << 30;
+	cout << p.desempilha() << "," << p.desempilha() << "," 
+		<< p.desempilha() << "," << p.desempilha() << endl;
+}
+
+
+void teste3() {
+	PilhaInt p;
+	p << 19 << 18 << 17 << 30;
+
+	p.print( cout );
+	cout << endl;
+}
+
+
+
+void teste4() {
+	PilhaInt p;
+	p << 19 << 18 << 17 << 30;
+
+	stringstream ss;
+	p.print( ss );
+
+	cout << "{" << ss.str() << "}" << endl;
+}
+
+
+void teste5() {
+	PilhaInt p, q;
+	q << 2;
+	p << 19 << 18 << 17 << 30;
+	q = p;
+	p.desempilha();
+	q << 7;
+	stringstream ssp, ssq;
+	p.print( ssp );
+	q.print( ssq );
+
+	cout << "q = " << ssq.str() << "\n" << "p = " << ssp.str() << endl;
 }
