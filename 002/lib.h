@@ -68,6 +68,10 @@ public:
 
 		ptr_arr = tmp;
 		tamanho = n;
+
+		if (topo >= tamanho) {
+			topo = tamanho;
+		}
 	}
 
 	void empilha(int elemento) {
