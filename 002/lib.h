@@ -106,6 +106,7 @@ public:
 	}
 
 	PilhaInt& operator=(const PilhaInt& p) {
+		if (this == &p) { return *this; }
 
 		while (this->topo > 0) {
 			this->desempilha();
