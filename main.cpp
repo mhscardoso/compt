@@ -1,35 +1,55 @@
 #include <iostream>
 #include <sstream>
 
-#include "002/lib.h"
+#define WORK 002
 
-void divide() {
-	cout << "----------------------------------" << endl;
-}
+#define STRINGFY(x) #x
+#define EXPAND(x) STRINGFY(x)
+
+#include EXPAND(WORK/lib.h)
+#include EXPAND(WORK/test.h)
+
+int NOTA = 0;
 
 int main(void) {
+	std::ios::sync_with_stdio(true);
 
-	teste1();
 	divide();
-	
-	teste2();
-	divide();
-	
-	teste3();
-	divide();
-	
-	teste4();
-	divide();
-	
-	teste5();
 	divide();
 
-	teste6();
-	divide();
+    auto esperados = ler_resultados(EXPAND(WORK/expected.txt));
 
-	teste7();
-	divide();
+    for (auto& t : testes) {
+        string output = capture_output(t.func);
 
-	teste8();
-	divide();
+        string esperado;
+        
+        try {
+            esperado = esperados.at(t.nome);
+        } catch (...) {
+            cout << t.nome << ": SEM RESULTADO ESPERADO\n";
+            continue;
+        }
+
+        trim_final(esperado);
+        trim_final(output);
+
+        if (output == esperado) {
+            cout << t.nome << ": OK\n";
+            NOTA++;
+        } else {
+            cout << t.nome << ": FAIL\n";
+            cout << "Esperado:\n" << esperado << endl;
+            cout << "Obtido:\n" << output << endl;
+        }
+
+        divide();
+    }
+
+    divide();
+    double nota = (NOTA / testes.size()) * 100;
+
+    cout << "Nota Final: " << nota << endl;
+
+    divide();
 }
