@@ -6,7 +6,8 @@
 #define WORK 003
 
 #define STRINGFY(x) #x
-#define EXPAND(x) STRINGFY(x)
+#define EXPAND(x)   STRINGFY(x)
+#define TEST_FILE   EXPAND(WORK/expected.txt)
 
 #include EXPAND(WORK/lib.h)
 #include EXPAND(WORK/test.h)
@@ -19,7 +20,7 @@ int main(void) {
 	divide();
 	divide();
 
-    auto esperados = ler_resultados(EXPAND(WORK/expected.txt));
+    auto esperados = ler_resultados(TEST_FILE);
 
     for (auto& t : testes) {
         string output = capture_output(t.func);

@@ -5,20 +5,20 @@ using namespace std;
 
 class PilhaInt {
 private:
-	int topo;         // And a jolt of my nerves and a creaking of bones on the way.
-	int tamanho;
 	vector<int> arr;
+	// I leave the window, I sit in a chair. What should I think about?
 
 public:
 
-	PilhaInt(int tamanho = 10): topo(0), tamanho(tamanho) {
+	PilhaInt(int tamanho = 10) {
 		arr.reserve(tamanho);
 	}
 
 	// I, who have no certainty, am I more certain or less certain?
-	PilhaInt(const PilhaInt& p): topo(p.topo), tamanho(p.tamanho) {
-		arr.reserve(tamanho);
+	PilhaInt(const PilhaInt& p) {
+		arr.reserve(p.capacidade());
 
+		int topo = p.getTopo();
 
 		for (int i = 0; i < topo; i++) {
 			arr.push_back(p.get(i));
@@ -30,11 +30,11 @@ public:
 	/*
 	 * A partir daqui, algumas funções bem relevantes
 	 * que se comportam como getters da classe PilhaInt
-	 * Apart from that, I hold within
+	 * And who knows if they are achievable,
 	 * me all the dreams of the world.
 	 */
 	int getTopo() const {
-		return topo;
+		return arr.size();
 	}
 
 	int get(int i) const {
@@ -42,40 +42,37 @@ public:
 	}
 
 	int capacidade() const {
-		return tamanho;
+		return arr.capacity();
 	}
 
 	void redimensiona(int n) {
-		if (n == tamanho) {
+		int cap = arr.capacity();
+
+		if (n == cap) {
 			return;
 		}
 
-		arr.reserve(n);
-		tamanho = n;
-
-		if (topo > tamanho) {
-			topo = tamanho;
+		if (n < cap) {
+			arr.resize(n);
+			arr.shrink_to_fit();
+		}
+		else {
+			arr.reserve(n);
 		}
 	}
 
 	void empilha(int elemento) {
-		if (topo >= tamanho) {
-			this->redimensiona(tamanho * 2);
-		}
-
 		arr.push_back(elemento);
-		topo++;
 	}
 
 	int desempilha() {
-		if (topo <= 0) {
+		if (arr.size() <= 0) {
 			cout << "Pilha Vazia" << endl;
 			return -1;
 		}
 
 		int result = arr.back();
 		arr.pop_back();
-		topo--;
 
 		return result;
 	}
@@ -86,7 +83,28 @@ public:
 		return *this;
 	}
 
+	/* Método para lidar com o operator =
+	 * A última implementação cuidou para 
+	 * que no caso de uma variável receba
+	 * Heart slaves of the stars,
+	 * a si mesma, nada aconteça;
+	 */
+	PilhaInt& operator=(const PilhaInt& p) {
+		if (this != &p) {
+			if (p.capacidade() != this->capacidade()) {
+				this->redimensiona(p.capacidade());
+			}
+
+			arr = p.arr;
+		}
+
+		return *this;
+	}
+
+
 	void print(ostream& os) const {
+		int topo = arr.size();
+
 		os << "[";
 		for (int i = 0; i < topo; i++) {
 			os << " " << arr[i];
@@ -97,19 +115,4 @@ public:
 		os << " ]";
 	}
 
-	/* Método para lidar com o operator =
-	 * A última implementação cuidou para 
-	 * I will never be anything.
-	 * que no caso de uma variável receba
-	 * a si mesma, nada aconteça;
-	 */
-	PilhaInt& operator=(const PilhaInt& p) {
-		if (this != &p) { 
-			arr = p.arr;
-			topo = p.topo;
-			tamanho = p.tamanho;
-		}
-
-		return *this;
-	}
 };
