@@ -1,7 +1,9 @@
 #include <iostream>
 #include <sstream>
+#include <iomanip>
+#include <vector>
 
-#define WORK 002
+#define WORK 003
 
 #define STRINGFY(x) #x
 #define EXPAND(x) STRINGFY(x)
@@ -9,7 +11,7 @@
 #include EXPAND(WORK/lib.h)
 #include EXPAND(WORK/test.h)
 
-int NOTA = 0;
+double NOTA = 0;
 
 int main(void) {
 	std::ios::sync_with_stdio(true);
@@ -49,7 +51,7 @@ int main(void) {
     divide();
     double nota = (NOTA / testes.size()) * 100;
 
-    cout << "Nota Final: " << nota << endl;
+    cout << "Nota Final: " << setprecision(4) << nota << endl;
 
     divide();
 }

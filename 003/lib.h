@@ -5,43 +5,27 @@ using namespace std;
 
 class PilhaInt {
 private:
-	int topo;     // And a jolt of my nerves and a creaking of bones on the way.
+	int topo;         // And a jolt of my nerves and a creaking of bones on the way.
 	int tamanho;
-	int *ptr_arr;
+	vector<int> arr;
 
 public:
 
 	PilhaInt(int tamanho = 10): topo(0), tamanho(tamanho) {
-		int *arr = (int*) malloc(tamanho * sizeof(int));
-
-		if (arr == NULL) {
-			cout << "Falhou a alocação de memória" << endl;
-			free(ptr_arr);
-			exit(1);
-		}
-
-		ptr_arr = arr;
+		arr.reserve(tamanho);
 	}
 
 	// I, who have no certainty, am I more certain or less certain?
 	PilhaInt(const PilhaInt& p): topo(p.topo), tamanho(p.tamanho) {
-		int *arr = (int*) malloc(tamanho * sizeof(int));
+		arr.reserve(tamanho);
 
-		if (arr == NULL) {
-			cout << "Falhou a alocação de memória" << endl;
-			exit(1);
-		}
 
 		for (int i = 0; i < topo; i++) {
-			arr[i] = p.get(i);
+			arr.push_back(p.get(i));
 		}
-
-		ptr_arr = arr;
 	}
 
-	~PilhaInt() {
-		free(ptr_arr);
-	}
+	~PilhaInt() { }
 
 	/*
 	 * A partir daqui, algumas funções bem relevantes
@@ -54,7 +38,7 @@ public:
 	}
 
 	int get(int i) const {
-		return ptr_arr[i];
+		return arr.at(i);
 	}
 
 	int capacidade() const {
@@ -66,15 +50,7 @@ public:
 			return;
 		}
 
-		int *tmp = (int *) realloc(ptr_arr, n * sizeof(int));
-
-		if (tmp == NULL) {
-			cout << "Teste Falhou" << endl;
-			free(ptr_arr);
-			return;
-		}
-
-		ptr_arr = tmp;
+		arr.reserve(n);
 		tamanho = n;
 
 		if (topo > tamanho) {
@@ -83,11 +59,12 @@ public:
 	}
 
 	void empilha(int elemento) {
-		if (topo == tamanho) {
+		if (topo >= tamanho) {
 			this->redimensiona(tamanho * 2);
 		}
 
-		ptr_arr[topo++] = elemento;
+		arr.push_back(elemento);
+		topo++;
 	}
 
 	int desempilha() {
@@ -96,7 +73,11 @@ public:
 			return -1;
 		}
 
-		return ptr_arr[--topo];
+		int result = arr.back();
+		arr.pop_back();
+		topo--;
+
+		return result;
 	}
 
 	PilhaInt& operator<<(const int elemento) {
@@ -108,7 +89,7 @@ public:
 	void print(ostream& os) const {
 		os << "[";
 		for (int i = 0; i < topo; i++) {
-			os << " " << ptr_arr[i];
+			os << " " << arr[i];
 			if (i < topo - 1) {
 				os << ",";
 			}
@@ -123,18 +104,10 @@ public:
 	 * a si mesma, nada aconteça;
 	 */
 	PilhaInt& operator=(const PilhaInt& p) {
-		if (this == &p) { return *this; }
-
-		while (this->topo > 0) {
-			this->desempilha();
-		}
-
-		int nova_capacidade = p.capacidade();
-
-		this->redimensiona(nova_capacidade);
-
-		for (int i = 0; i < p.getTopo(); i++) {
-			this->empilha(p.get(i));
+		if (this != &p) { 
+			arr = p.arr;
+			topo = p.topo;
+			tamanho = p.tamanho;
 		}
 
 		return *this;
