@@ -1,9 +1,13 @@
+#include <initializer_list>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 #include <vector>
 
-#define WORK 003
+// Define folder and mode
+#define WORK  004
+#define JUDGE 0
+
 
 #define STRINGFY(x) #x
 #define EXPAND(x)   STRINGFY(x)
@@ -12,9 +16,12 @@
 #include EXPAND(WORK/lib.h)
 #include EXPAND(WORK/test.h)
 
-double NOTA = 0;
 
 int main(void) {
+
+#if JUDGE == 0
+
+    double NOTA = 0;
 	std::ios::sync_with_stdio(true);
 
 	divide();
@@ -55,4 +62,11 @@ int main(void) {
     cout << "Nota Final: " << setprecision(4) << nota << endl;
 
     divide();
+
+#else
+
+    testes.at(JUDGE-1).func();
+
+#endif // JUDGE == ?
+
 }

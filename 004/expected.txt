@@ -1,0 +1,29 @@
+teste1:
+jan = 1
+pi = 3.14
+
+teste2:
+jan = 1
+2 = fev
+pi = 3.14
+
+teste3:
+jan = 1
+2 = fev
+lista = [ 1 2 3 ]
+1 = 2
+1.1 = 2.2
+
+teste4:
+jan = 1
+pi = 3.14
+1 = 2
+
+teste5:
+Inicio
+jan = 1
+2 = fev
+lista = [ 1 2 3 ]
+1 = 2
+1.1 = 2.2
+Fim
