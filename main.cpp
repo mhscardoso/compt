@@ -8,7 +8,7 @@
 #include <map>
 
 // Define folder and mode
-#define WORK  005
+#define WORK  006
 #define JUDGE 0
 
 double NOTA = 0;

@@ -52,6 +52,7 @@ TT(teste5) {
 	cout << a * 3.0 << endl;
 }
 
+
 TT(teste6) {
 	Vetor<3, double> a;
 
@@ -59,6 +60,7 @@ TT(teste6) {
 
 	cout << 2.1 * a << endl;
 }
+
 
 TT(teste7) {
 	Vetor<3, double> a, b;
