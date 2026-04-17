@@ -1,5 +1,7 @@
 using namespace std;
 
+#include <vector>
+
 template <int N, typename T>
 class Vetor {
 
@@ -7,6 +9,33 @@ private:
     vector<T> principal;
 
 public:
+
+    class ProdVet {
+
+    private:
+        const Vetor<N, T>& a;
+
+        ProdVet(const Vetor<N, T>& primeiro): a(primeiro) {}
+        friend class Vetor<N, T>;
+
+    public:
+        
+        Vetor<N, T> vetorial(const Vetor<N, T>& b) const {
+            Vetor<N, T> resultado;
+
+            resultado.insere(b.get(1)*a.get(2) - b.get(2)*a.get(1));
+            resultado.insere(b.get(2)*a.get(0) - b.get(0)*a.get(2));
+            resultado.insere(b.get(0)*a.get(1) - b.get(1)*a.get(0));
+
+            return resultado;
+        }
+    };
+
+
+    ProdVet operator*() const {
+        return ProdVet(*this);
+    }
+
     
     Vetor& operator=(const initializer_list<T>& lista) {
         if (lista.size() != N) {
@@ -76,12 +105,13 @@ public:
 
 
     void print(ostream& o) const {
-        o << "[ ";
-        for(auto x : principal) {
-            o << x << " ";
+        for(auto x = principal.begin(); x != principal.end(); ++x) {
+            o << *x;
+
+            if (x < principal.end() - 1) {
+                o << " ";
+            }
         }
-            
-        o << "]";
     }
 };
 
@@ -97,4 +127,10 @@ ostream& operator<<(ostream& o, const Vetor<N, T>& v) {
 template <int N, typename T>
 Vetor<N, T> operator*(double b, const Vetor<N, T>& v) {
     return v * b;
+}
+
+
+template <int N, typename T>
+Vetor<N, T> operator*(const Vetor<N, T>& v, const typename Vetor<N, T>::ProdVet& p) {
+    return p.vetorial(v);
 }

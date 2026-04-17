@@ -70,4 +70,3 @@ TT(teste7) {
 
 	cout << a + b + a * 2.0 << endl;
 }
-
