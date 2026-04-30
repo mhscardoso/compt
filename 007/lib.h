@@ -34,7 +34,7 @@ class AbstractPair {
 
 public:
 	virtual void imprime(ostream& o) const = 0;
-	virtual AbstractPair* clone() const = 0;
+	virtual shared_ptr<AbstractPair> clone() const = 0;
 	virtual ~AbstractPair() {}
 };
 
@@ -49,8 +49,10 @@ private:
 public:
 	PairImpl(const A& a, const B& b): key(a), value(b) {}
 
-	AbstractPair* clone() const override {
-		return new PairImpl<A, B>(key, value);
+	shared_ptr<AbstractPair> clone() const override {
+		shared_ptr<AbstractPair> result{ new PairImpl<A, B>(key, value) };
+		
+		return result;
 	}
 
 	/* Método imprime destinado a
@@ -74,23 +76,18 @@ public:
 class Pair {
 
 private:
-	AbstractPair *p;
+	shared_ptr<AbstractPair> p;
 
 public:
 
  	template <typename A, typename B>
  	Pair(A key, B value) {
- 		p = new PairImpl<A, B>(key, value);
+		shared_ptr<AbstractPair> a{ new PairImpl<A, B>(key, value) };
+ 		p = a;
 	}
 
 	Pair(const Pair& other_pair) {
 		p = other_pair.p->clone();
-	}
-
-
-	// Relevante
-	~Pair() {
-		delete p;
 	}
 
 	void imprime(ostream& o) const {

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <memory>
 #include <math.h>
 #include <string>
 #include <vector>
