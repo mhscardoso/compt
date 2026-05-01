@@ -1,0 +1,22 @@
+teste1:
+2 9 8 8 
+jose casado 
+3.11 5 7.9 
+
+teste2:
+1 5 9 3 
+3.1 5.3 9 
+a e i o u ypsilon 
+
+teste3:
+1 9 5 8 
+joao Solteiro 
+3.14 999 7.9 900 
+
+teste4:
+[ 1, 2 ] [ 4, 6 ] [ 6, 7 ] 
+1 2 4 6 6 7 
+HELLO, WORLD 
+
+teste5:
+1 4 9 
