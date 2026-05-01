@@ -78,7 +78,7 @@ public:
     }
 
 
-    Vetor<N, T> operator*(const double b) const {
+    Vetor<N, T> operator*(const T b) const {
         Vetor<N, T> resultado;
 
         for (int i = 0; i < N; ++i) {
@@ -125,7 +125,7 @@ ostream& operator<<(ostream& o, const Vetor<N, T>& v) {
 
 
 template <int N, typename T>
-Vetor<N, T> operator*(double b, const Vetor<N, T>& v) {
+Vetor<N, T> operator*(T b, const Vetor<N, T>& v) {
     return v * b;
 }
 
