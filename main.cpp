@@ -1,4 +1,6 @@
 #include <initializer_list>
+#include <type_traits>
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
