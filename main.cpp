@@ -24,7 +24,6 @@ double NOTA = 0;
 #include EXPAND(WORK/lib.h)
 #include EXPAND(WORK/test.h)
 
-
 void execute_atomic_test(
     const TestCase& t, 
     const std::unordered_map<std::string, std::string>& esperados
@@ -54,7 +53,6 @@ void execute_atomic_test(
 
     divide();
 }
-
 
 
 int main(void) {
@@ -87,5 +85,55 @@ int main(void) {
     execute_atomic_test(t, esperados);
 
 #endif // JUDGE == 0
+
+    /////////////// ESPECÍFICO PARA O TRABALHO 010 - DERIVADOR SIMBÓLICO PARTE 1 ///////////////
+
+    // cout << "teste1" << endl;
+    // teste1();
+
+    // cout << endl;
+
+    // cout << "teste2" << endl;
+    // teste2();
+
+    // cout << endl;
+
+    // cout << "teste3" << endl;
+    // teste3();
+
+    // cout << endl;
+
+    // cout << "teste4" << endl;
+    // teste4();
+
+    // cout << endl;
+
+    // cout << "teste5" << endl;
+    // teste5();
+
+    // cout << endl;
+
+    // cout << "teste6" << endl;
+    // teste6();
+
+    // cout << endl;
+
+    // cout << "teste7" << endl;
+    // teste7();
+
+    // cout << endl;
+
+    // cout << "teste8" << endl;
+    // teste8();
+
+    // cout << endl;
+
+    // cout << "teste9" << endl;
+    // teste9();
+
+    // cout << endl;
+
+    // cout << "teste10" << endl;
+    // teste10();
 
 }

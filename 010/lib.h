@@ -1,182 +1,366 @@
 using namespace std;
 
-class Global {
-public:
-	double v(double x) const {
-		return x;
-	}
+template <typename E, typename DX>
+struct Expr {
+	E e;
+	DX dx;
 
-	double dx(double) const {
-		return 1;
-	}
-};
-
-Global x;
-
-class Const {
-private:
-    double c;
-
-public:
-    Const(double c) : c(c) {}
-
-    double v(double) const {
-        return c;
-    }
-
-    double dx(double) const {
-        return 0;
-    }
+	double operator()(double v) const { return e(v); }
 };
 
 
-class Expr {
-public:
-	virtual ~Expr() = default;
-	virtual double v(double x) = 0;
-	virtual double dx(double x) = 0;
+template <typename E, typename DX>
+Expr(E, DX) -> Expr<E, DX>;
+
+
+Expr x{
+	[](double v) { return v; },
+	[](double v) { return 1; }
 };
 
 
-template <typename L, typename R>
-class Mul : public Expr {
-private:
-	L l;
-    R r;
+// ----------------------------------------- //
+// ---------- FUNCTORS OPERATIONS ---------- //
+// ----------------------------------------- //
 
-public:
-    Mul(L l, R r) : l(l), r(r) {}
 
-    double v(double x) const override {
-        return l.v(x) * r.v(x);
-    }
+template <typename A, typename B>
+struct AddEval {
+    A a;
+    B b;
 
-    double dx(double x) const override {
-        // regra do produto
-        return l.dx(x) * r.v(x) + l.v(x)  * r.dx(x);
+    double operator()(double v) const {
+        return a(v) + b(v);
     }
 };
 
 
-template <typename L, typename R>
-class Add : public Expr {
-private:
-	L l;
-    R r;
+template <typename A, typename B>
+struct AddDx {
+    A a;
+    B b;
 
-public:
-    Add(L l, R r) : l(l), r(r) {}
-
-    double v(double x) const override {
-        return l.v(x) + r.v(x);
-    }
-
-    double dx(double x) const override {
-        return l.dx(x) + r.dx(x);
+    double operator()(double v) const {
+        return a.dx(v) + b.dx(v);
     }
 };
 
 
-template <typename L, typename R>
-class Sub : public Expr {
-private:
-	L l;
-    R r;
+template <typename A, typename B>
+struct SubEval {
+    A a;
+    B b;
 
-public:
-    Sub(L l, R r) : l(l), r(r) {}
-
-    double v(double x) const override {
-        return l.v(x) - r.v(x);
-    }
-
-    double dx(double x) const override {
-        return l.dx(x) - r.dx(x);
+    double operator()(double v) const {
+        return a(v) - b(v);
     }
 };
 
 
-template <typename L, typename R>
-class Div : public Expr {
-private:
-	L l;
-    R r;
+template <typename A, typename B>
+struct SubDx {
+    A a;
+    B b;
 
-public:
-    Div(L l, R r) : l(l), r(r) {}
-
-    double v(double x) const override {
-        return l.v(x) / r.v(x);
-    }
-
-    double dx(double x) const override {
-        return (l.dx(x) * r.v(x) + l.v(x) * r.dx(x)) / (r.v(x) * r.v(x));
+    double operator()(double v) const {
+        return a.dx(v) - b.dx(v);
     }
 };
+
+
+template <typename A, typename B>
+struct DivEval {
+    A a;
+    B b;
+
+    double operator()(double v) const {
+        return a(v) / b(v);
+    }
+};
+
+
+template <typename A, typename B>
+struct DivDx {
+    A a;
+    B b;
+
+    double operator()(double v) const {
+        return (a.dx(v) * b(v) - a(v) * b.dx(v)) / (b(v) * b(v));
+    }
+};
+
+
+template <typename A, typename B>
+struct MulEval {
+    A a;
+    B b;
+
+    double operator()(double v) const {
+        return a(v) * b(v);
+    }
+};
+
+
+template <typename A, typename B>
+struct MulDx {
+    A a;
+    B b;
+
+    double operator()(double v) const {
+        return a.dx(v) * b(v) + a(v) * b.dx(v);
+    }
+};
+
+
+// ------------------------------------- //
+// ----------   EXPR RETURN   ---------- //
+// ------------------------------------- //
 
 
 template <typename T>
-auto make_expr(T v) {
-    if constexpr (is_arithmetic_v<T>)
-        return Const(v);
-    else
-        return v;
+auto adapter(T f) {
+	return f;
+}
+
+auto adapter(int v) {
+	return Expr{
+		[v](double) { return v; },
+		[] (double) { return 0; }
+	};
+}
+
+auto adapter(double v) {
+	return Expr{
+		[v](double) { return v; },
+		[] (double) { return 0; }
+	};
 }
 
 
-template <typename L, typename R>
-auto operator*(L l, R r) {
-	return Mul<decltype(make_expr(l)), decltype(make_expr(r))>(make_expr(l), make_expr(r));
+// ------------------------------------- //
+// ---------- MATH OPERATIONS ---------- //
+// ------------------------------------- //
+
+template <typename A, typename B>
+auto operator+(A a, B b) {
+
+    auto aa = adapter(a);
+    auto bb = adapter(b);
+
+    return Expr{
+        AddEval<decltype(aa), decltype(bb)>{aa, bb},
+        AddDx<decltype(aa), decltype(bb)>{aa, bb}
+    };
 }
 
 
-// template <typename R>
-// auto operator*(double c, R r) {
-//     return Mul<Const, R>(Const(c), r);
-// }
+template <typename A, typename B>
+auto operator-(A a, B b) {
+	auto aa = adapter(a);
+	auto bb = adapter(b);
+
+	return Expr{
+        SubEval<decltype(aa), decltype(bb)>{aa, bb},
+        SubDx<decltype(aa), decltype(bb)>{aa, bb}
+	};
+}
 
 
-// template <typename R>
-// auto operator*(int c, R r) {
-//     return Mul<Const, R>(Const(c), r);
-// }
+template <typename A, typename B>
+auto operator*(A a, B b) {
+	auto aa = adapter(a);
+	auto bb = adapter(b);
+
+	return Expr{
+        MulEval<decltype(aa), decltype(bb)>{aa, bb},
+        MulDx<decltype(aa), decltype(bb)>{aa, bb}
+	};
+}
 
 
-// template <typename L>
-// auto operator*(L l, double c) {
-//     return Mul<L, Const>(l, Const(c));
-// }
+template <typename A, typename B>
+auto operator/(A a, B b) {
+	auto aa = adapter(a);
+	auto bb = adapter(b);
 
-// template <typename L>
-// auto operator*(L l, int c) {
-//     return Mul<L, Const>(l, Const(c));
-// }
-
-
-// template <typename L, typename R>
-// Add<L, R> operator+(L l, R r) {
-//     return Add<L, R>(l, r);
-// }
+	return Expr{
+        DivEval<decltype(aa), decltype(bb)>{aa, bb},
+        DivDx<decltype(aa), decltype(bb)>{aa, bb}
+	};
+}
 
 
-// template <typename R>
-// auto operator+(double c, R r) {
-//     return Add<Const, R>(Const(c), r);
-// }
+// ---------------------------------------- //
+// ---------- COMPOSE OPERATIONS ---------- //
+// ---------------------------------------- //
 
 
-// template <typename R>
-// auto operator+(int c, R r) {
-//     return Add<Const, R>(Const(c), r);
-// }
+template <typename A>
+struct SinEval {
+    A a;
+
+    double operator()(double v) const {
+        return std::sin(a(v));
+    }
+};
 
 
-// template <typename L>
-// auto operator+(L l, double c) {
-//     return Add<L, Const>(l, Const(c));
-// }
+template <typename A>
+struct SinDx {
+    A a;
 
-// template <typename L>
-// auto operator+(L l, int c) {
-//     return Add<L, Const>(l, Const(c));
-// }
+    double operator()(double v) const {
+        return std::cos(a(v)) * a.dx(v);
+    }
+};
+
+
+template <typename A>
+auto sin(A a) {
+
+    auto aa = adapter(a);
+
+    return Expr{
+        SinEval<decltype(aa)>{aa},
+        SinDx<decltype(aa)>{aa}
+    };
+}
+
+
+template <typename A>
+struct CosEval {
+    A a;
+
+    double operator()(double v) const {
+        return std::cos(a(v));
+    }
+};
+
+
+template <typename A>
+struct CosDx {
+    A a;
+
+    double operator()(double v) const {
+        return - std::sin(a(v)) * a.dx(v);
+    }
+};
+
+
+template <typename A>
+auto cos(A a) {
+
+    auto aa = adapter(a);
+
+    return Expr{
+        CosEval<decltype(aa)>{aa},
+        CosDx<decltype(aa)>{aa}
+    };
+}
+
+
+
+template <typename A>
+struct ExpEval {
+    A a;
+
+    double operator()(double v) const {
+        return std::exp(a(v));
+    }
+};
+
+
+template <typename A>
+struct ExpDx {
+    A a;
+
+    double operator()(double v) const {
+        return std::exp(a(v)) * a.dx(v);
+    }
+};
+
+
+template <typename A>
+auto exp(A a) {
+
+    auto aa = adapter(a);
+
+    return Expr{
+        ExpEval<decltype(aa)>{aa},
+        ExpDx<decltype(aa)>{aa}
+    };
+}
+
+
+template <typename A>
+struct LogEval {
+    A a;
+
+    double operator()(double v) const {
+        return std::log(a(v));
+    }
+};
+
+
+template <typename A>
+struct LogDx {
+    A a;
+
+    double operator()(double v) const {
+        return a.dx(v) / a(v);
+    }
+};
+
+
+template <typename A>
+auto log(A a) {
+
+    auto aa = adapter(a);
+
+    return Expr{
+        LogEval<decltype(aa)>{aa},
+        LogDx<decltype(aa)>{aa}
+    };
+}
+
+
+
+template <typename A, typename B>
+struct PowEval {
+    A a;
+    B b;
+
+    double operator()(double v) const {
+        return std::pow(a(v), b(v));
+    }
+};
+
+
+template <typename A, typename B>
+struct PowDx {
+    A a;
+    B b;
+
+    double operator()(double v) const {
+        return b(v) * pow(a(v), b(v) - 1) * a.dx(v);
+    }
+};
+
+
+
+template <typename A, typename B>
+auto operator->*(A a, B b) {
+
+    static_assert(
+        is_integral_v<B>,
+        "Operador de potenciação definido apenas para inteiros"
+    );
+
+    auto aa = adapter(a);
+    auto bb = adapter(b);
+
+    return Expr{
+        PowEval<decltype(aa), decltype(bb)>{aa, bb},
+        PowDx<decltype(aa), decltype(bb)>{aa, bb}
+    };
+}
