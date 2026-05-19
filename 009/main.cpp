@@ -1,8 +1,16 @@
 // Banca de Testes
 
+#include <map>
+#include <cmath>
+#include <vector>
+#include <memory>
+#include <sstream>
+#include <iostream>
+#include <algorithm>
+#include <type_traits>
+#include <initializer_list>
 
-#include "../tests.h"
-
+#include "lib.h"
 
 
 template <typename T> 
@@ -37,9 +45,9 @@ struct PrintM3 {
 };
 
 
+int main(void) {
 
-
-TT(teste1) {
+#ifdef teste1
 	vector<int> v1 = { 2, 9, 8, 8 };
     vector<string> v2 = { "jose", "casado" };
     vector<double> v3 = { 3.11, 5, 7.9 };
@@ -50,9 +58,9 @@ TT(teste1) {
     cout << endl;
     v3 | []( double n ){ cout << n << " "; };
     cout << endl;
-}
 
-TT(teste2) {
+
+#elif defined(teste2)
 	int tabInt[] = { 1, 5, 9, 3 };
 	double tabDouble[] = { 3.1, 5.3, 9 };
 	string tabString[] = { "a", "e", "i", "o", "u", "ypsilon" };
@@ -63,10 +71,10 @@ TT(teste2) {
 	cout << endl;
 	tabString | []( string n ){ cout << n << " "; };
 	cout << endl;
-}
 
 
-TT(teste3) {
+
+#elif defined(teste3)
     vector<int> v1 = { 1, 9, 5, 8 };
     vector<string> v2 = { "joao", "Solteiro" };
     vector<double> v3 = { 3.14, 999, 7.9, 900 };
@@ -77,11 +85,11 @@ TT(teste3) {
     cout << endl;
     v3 |  myPrint<double>;
     cout << endl;
-}
 
 
 
-TT(teste4) {
+
+#elif defined(teste4)
     vector<vector<int>> m = { { 1, 2 }, { 4, 6 }, { 6, 7 } };
     string tab[] = { "hello,", "world" };
     
@@ -90,84 +98,102 @@ TT(teste4) {
     m | PrintM2();
     cout << endl;
     tab | PrintM3();
-}
+    cout << endl;
 
 
-TT(teste5) {
+
+#elif defined(teste5)
     auto x = { 1, 2, 3 };
     x | []( int x ) { cout << x*x << " "; };
-}
+    cout << endl;
 
-TT(teste6) {
+
+
+#elif defined(teste6)
     vector<int> v = { 1, 2, 3, 4, 5, 6 };
     
     v | []( int x ) { return x % 2 == 0; }
       | []( int x ) { cout << x << endl; };
-}
 
 
-TT(teste7) {
+
+#elif defined(teste7)
     vector<int> v = { 1, 2, 3, 4, 5, 6 };
     
     v | []( int x ) { return x % 2 == 0; }
       | []( int x ) { return x * 4;      }
       | []( int x ) { cout << x << endl; };
-}
 
 
-TT(teste8) {
+
+#elif defined(teste8)
     vector<int> v1 = { 2, 9, 8, 8, 7, 4 };
     auto result = v1 | []( int x ) { return x % 2 == 0; };
     for( auto x : result ) 
         cout << x << " ";
-}
+
+    cout << endl;
 
 
-TT(teste9) {
+
+#elif defined(teste9)
     vector<int> v1 = { 2, 9, 8, 8, 7, 4 };
     v1 | []( int x ) { return x % 2 == 0; } | [] ( int x ) { cout << x << " "; };
-}
+
+    cout << endl;
 
 
-TT(teste10) {
+
+#elif defined(teste10)
     int v1[] = { 2, 9, 8, 8, 7, 4 };
     auto result = v1 | []( int x ) { return x % 2 == 0; };
     for( auto x : result ) 
         cout << x << " ";
-}
+
+    cout << endl;
 
 
-TT(teste11) {
+
+#elif defined(teste11)
     int v1[] = { 2, 9, 8, 8, 7, 4 };
     v1 | []( int x ) { return x % 2 == 0; } | [] ( int x ) { cout << x << " "; };
-}
+
+    cout << endl;
 
 
-TT(teste12) {
+
+#elif defined(teste12)
     map<string,string> v = { { "a", "1" }, { "b", "2" }, { "c", "3" }, { "d", "4" }, { "e", "5" } };
     v | []( auto x ){ return pair{ x.first, stod( x.second ) }; } | []( auto p ) { cout << p.second + 1.1 << " "; };
-}
+
+    cout << endl;
 
 
-TT(teste13) {
+#elif defined(teste13)
     map<string,string> v = { { "a", "1" }, { "b", "2" }, { "c", "3" }, { "d", "4" }, { "e", "5" }, { "f", "6" } };
     auto par = []( auto x ){ return stoi( x.second ) % 2 == 0; };
     auto upper_first = []( auto x ){ string st = x.first; transform(st.begin(), st.end(), st.begin(), ::toupper); return st; };
     v | par | upper_first | []( auto st ) { cout << st + "! "; };
-}
+    cout << endl;
 
 
-TT(teste14) {
+
+#elif defined(teste14)
     map<string,string> v = { { "a", "1" }, { "b", "2" }, { "c", "3" }, { "d", "4" }, { "e", "5" }, { "F", "6" } };
     auto par = []( auto x ){ return stoi( x.second ) % 2 == 0; };
     auto first = []( pair<string,string> p ) { return p.first; };
     auto upper = []( string st ){ transform(st.begin(), st.end(), st.begin(), ::toupper); return st; };
     vector<string> result = v | par | first | upper; 
     result | []( auto st ) { cout << st + "! "; };
-}
+    cout << endl;
 
 
-TT(teste15) {
+
+#elif defined(teste15)
     vector<string> v1 = { "janeiro", "fevereiro", "março", "abril", "maio" };
     v1 | &string::length | [] ( int x ) { cout << x << " "; };
+    cout << endl;
+
+#endif
+
 }

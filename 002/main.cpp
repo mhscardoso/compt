@@ -1,7 +1,9 @@
 // Banca de Testes
 
+#include <iostream>
+#include <sstream>
 
-#include "../tests.h"
+#include "lib.h"
 
 PilhaInt embaralha( PilhaInt q ) {
 	int aux = q.desempilha();
@@ -10,8 +12,10 @@ PilhaInt embaralha( PilhaInt q ) {
 	return q;
 }
 
+int main(void) {
 
-TT(teste1) {
+
+#ifdef teste1
 	PilhaInt p;
 	p.empilha( 1 );
 	p << 3 << 9 << 13 << 89;
@@ -22,26 +26,23 @@ TT(teste1) {
 	stringstream ss;
 	p.print( ss );
 	cout << endl << "{" << ss.str() << "}" << endl;
-}
 
-TT(teste2) {
+#elif defined(teste2)
 	PilhaInt a(5), b(15);
 	cout << a.capacidade() << endl;
 	cout << b.capacidade() << endl;
-}
 
 
-TT(teste3) {
+#elif defined(teste3)
 	PilhaInt a( 7 );
 	a << 3 << 5 << 13 << 19;
 	PilhaInt b{ embaralha( a ) };
 	a.print( cout ); cout << endl;
 	b.print( cout ); cout << endl;
-}
 
 
 
-TT(teste4) {
+#elif defined(teste4)
 	PilhaInt a{7}, b{500}, c{5};
 	a << 8 << 3 << 1 << 4 << 5;
 	b << 1 << 2 << 3;
@@ -53,10 +54,9 @@ TT(teste4) {
 	a.print( cout ); cout << endl;
 	b.print( cout ); cout << endl;
 	c.print( cout ); cout << endl;
-}
 
 
-TT(teste5) {
+#elif defined(teste5)
 	PilhaInt a{7}, b{500000}, c{5};
 	a << 8 << 3 << 1 << 4 << 5;
 	for( int i = 0; i < b.capacidade(); i++ )
@@ -65,17 +65,16 @@ TT(teste5) {
 	a = b;
 	b = c;
 	cout << a.capacidade() << ", " << b.capacidade() << ", " << c.capacidade() << endl;
-}
 
 
-TT(teste6) {
+#elif defined(teste6)
 	PilhaInt a{7};
 	a << 8 << 3 << 1 << 4 << 5;
 	a = a;
 	a.print( cout ); cout << endl;
-}
 
-TT(teste7) {
+
+#elif defined(teste7)
 	PilhaInt a{81};
 	a << 5 << 6 << 3 << 2 << 9 << 13;
 	a.redimensiona( 81 ); cout << a.capacidade() << endl;
@@ -84,9 +83,10 @@ TT(teste7) {
 	a.print( cout ); cout << endl;
 	a.redimensiona( 3 ); cout << a.capacidade() << endl;
 	a.print( cout ); cout << endl;
-}
 
-TT(teste8) {
+
+
+#elif defined(teste8)
 	PilhaInt a{3};
 	for( int i = 0; i < 20; i++ ) {
 		a << i;
@@ -94,4 +94,8 @@ TT(teste8) {
 	}
 	cout << endl;
 	a.print( cout ); cout << endl;
+
+#endif
+
+
 }

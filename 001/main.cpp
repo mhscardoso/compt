@@ -1,37 +1,39 @@
 // Banca de Testes
 
+#include <iostream>
+#include <sstream>
 
-#include "../tests.h"
+#include "lib.h"
 
+int main(void) {
 
-TT(teste1) {
+#ifdef teste1
 	PilhaInt p;
 	p.empilha( 1 );
 	p.empilha( 2 );
 	cout << p.desempilha() << endl;
 	cout << p.desempilha() << endl;
-}
 
 
-TT(teste2) {
+#elif defined(teste2)
 	PilhaInt p;
 	p << 19 << 18 << 17;
 	p << 30;
 	cout << p.desempilha() << "," << p.desempilha() << "," 
 		<< p.desempilha() << "," << p.desempilha() << endl;
-}
 
 
-TT(teste3) {
+
+#elif defined(teste3)
 	PilhaInt p;
 	p << 19 << 18 << 17 << 30;
 
 	p.print( cout );
 	cout << endl;
-}
 
 
-TT(teste4) {
+
+#elif defined(teste4)
 	PilhaInt p;
 	p << 19 << 18 << 17 << 30;
 
@@ -39,10 +41,9 @@ TT(teste4) {
 	p.print( ss );
 
 	cout << "{" << ss.str() << "}" << endl;
-}
 
 
-TT(teste5) {
+#elif defined(teste5)
 	PilhaInt p, q;
 	q << 2;
 	p << 19 << 18 << 17 << 30;
@@ -54,5 +55,10 @@ TT(teste5) {
 	q.print( ssq );
 
 	cout << "q = " << ssq.str() << "\n" << "p = " << ssp.str() << endl;	
+
+#endif
+
+	return 0;
+
 }
 
