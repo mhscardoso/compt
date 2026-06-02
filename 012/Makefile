@@ -1,6 +1,6 @@
 SHELL    := /bin/bash
 CXX      := g++
-CXXFLAGS := -std=c++17 -Wall -Wextra
+CXXFLAGS := -std=c++20 -Wall -Wextra
 SRC      := main.cpp
 BUILD    := build
 
@@ -9,43 +9,43 @@ TESTS := teste1 teste2 teste3 teste4 teste5 teste6 teste7 teste8 teste9 teste10
 
 
 define teste1
-f(5.1)=78.03, f'(5.1)=30.6
+1 4 9 16 25 
 endef
 
 define teste2
-f(1.1)=12.111, f'(1.1)=22.23
+1 3 5 7 
 endef
 
 define teste3
-f(0.5)=-0.208714, f'(0.5)=-1.23783
+9 15 21 
 endef
 
 define teste4
-f(3.14)=-0.53995, f'(3.14)=-2.66732
+2 4 6 
 endef
 
 define teste5
-f(3.14159)=-2.65359e-06, f'(3.14159)=1
+4 16 36 
 endef
 
 define teste6
-f(-7.3)=-335.727, f'(-7.3)=145.27
+11 21 31 
 endef
 
 define teste7
-f(-0.5)=1, f'(-0.5)=0
+foofoo barbar bazbaz 
 endef
 
 define teste8
-f(0.1)=0.787881, f'(0.1)=-0.97467
+a:1 b:2 c:3 
 endef
 
 define teste9
-f(3)=27, f'(3)=56.6625
+1 4 9 | 16 25 36 | 
 endef
 
 define teste10
-
+2 4 6 8 10 
 endef
 
 
@@ -62,7 +62,10 @@ $(TESTS): %:
 	$(file > $(BUILD)/$*_expected.txt,$($*))
 	@$(CXX) $(CXXFLAGS) -D$* -o $(BUILD)/$* $(SRC) 2>&1 || \
 		(printf "\033[0;31m[COMPILE ERROR]\033[0m $*\n" && exit 1)
-	@if diff $(BUILD)/$*_expected.txt <($(BUILD)/$*) > /dev/null 2>&1; then \
+	@if diff \
+		<(perl -pe 'chomp if eof' $(BUILD)/$*_expected.txt) \
+		<($(BUILD)/$* | perl -pe 'chomp if eof') \
+		> /dev/null 2>&1; then \
 		printf "\033[0;32m[PASS]\033[0m $*\n"; \
 	else \
 		printf "\033[0;31m[FAIL]\033[0m $*\n"; \

@@ -2,11 +2,11 @@ using namespace std;
 
 template <typename E, typename DX>
 struct Expr {
-	E e;
-	DX dx;
+    E e;
+    DX dx;
 
     template<typename K>
-	double operator()(K v) const { return e(v); }
+    auto operator()(K v) const { return e(v); }
 };
 
 
@@ -15,8 +15,8 @@ Expr(E, DX) -> Expr<E, DX>;
 
 
 Expr x{
-	[](double v) { return v; },
-	[](double)   { return 1; }
+    [](const auto& v) { return v; },
+    [](const auto&)   { return 1; }
 };
 
 
@@ -30,7 +30,7 @@ struct AddEval {
     A a;
     B b;
 
-    double operator()(double v) const {
+    auto operator()(const auto& v) const {
         return a(v) + b(v);
     }
 };
@@ -120,21 +120,28 @@ struct MulDx {
 
 template <typename T>
 auto adapter(T f) {
-	return f;
+    return f;
 }
 
 auto adapter(int v) {
-	return Expr{
-		[v](double) { return v; },
-		[] (double) { return 0; }
-	};
+    return Expr{
+        [v](double) { return v; },
+        [] (double) { return 0; }
+    };
 }
 
 auto adapter(double v) {
-	return Expr{
-		[v](double) { return v; },
-		[] (double) { return 0; }
-	};
+    return Expr{
+        [v](double) { return v; },
+        [] (double) { return 0; }
+    };
+}
+
+auto adapter(string v) {
+    return Expr{
+        [v](double) { return v; },
+        [] (double) { return 0; }
+    };
 }
 
 
@@ -157,37 +164,37 @@ auto operator+(A a, B b) {
 
 template <typename A, typename B>
 auto operator-(A a, B b) {
-	auto aa = adapter(a);
-	auto bb = adapter(b);
+    auto aa = adapter(a);
+    auto bb = adapter(b);
 
-	return Expr{
+    return Expr{
         SubEval<decltype(aa), decltype(bb)>{aa, bb},
         SubDx<decltype(aa), decltype(bb)>{aa, bb}
-	};
+    };
 }
 
 
 template <typename A, typename B>
 auto operator*(A a, B b) {
-	auto aa = adapter(a);
-	auto bb = adapter(b);
+    auto aa = adapter(a);
+    auto bb = adapter(b);
 
-	return Expr{
+    return Expr{
         MulEval<decltype(aa), decltype(bb)>{aa, bb},
         MulDx<decltype(aa), decltype(bb)>{aa, bb}
-	};
+    };
 }
 
 
 template <typename A, typename B>
 auto operator/(A a, B b) {
-	auto aa = adapter(a);
-	auto bb = adapter(b);
+    auto aa = adapter(a);
+    auto bb = adapter(b);
 
-	return Expr{
+    return Expr{
         DivEval<decltype(aa), decltype(bb)>{aa, bb},
         DivDx<decltype(aa), decltype(bb)>{aa, bb}
-	};
+    };
 }
 
 
@@ -364,4 +371,102 @@ auto operator->*(A a, B b) {
         PowEval<decltype(aa), decltype(bb)>{aa, bb},
         PowDx<decltype(aa), decltype(bb)>{aa, bb}
     };
+}
+
+
+template <typename T, typename F>
+auto operator|(const T& arr, F func) {
+
+    using Elem = decay_t<decltype(*begin(arr))>;
+    using Ret  = decay_t<invoke_result_t<F, Elem>>;
+
+    if constexpr (is_same_v<Ret, void>) {
+        // print
+        for_each(begin(arr), end(arr), func);
+
+        return;
+    }
+    else if constexpr (is_same_v<Ret, bool>) {
+        // filter
+        vector<Elem> result;
+
+        for (const auto& e : arr) {
+            if (invoke(func, e)) {
+                result.push_back(e);
+            }
+        }
+
+        return result;
+
+    } else {
+        // map
+        vector<Ret> result;
+
+        for (const auto& e : arr) {
+            result.push_back(invoke(func, e));
+        }
+
+        return result;
+    }
+}
+
+
+
+template<typename A>
+struct PrintProxy {
+    ostream& os;
+    A e;
+    string suffix;
+
+    template <typename T>
+    void operator()(const T& v) const {
+        os << e(v) << suffix;
+    }
+};
+
+
+template <typename E, typename DX>
+auto operator<<(ostream& os, Expr<E, DX> e) {
+    return PrintProxy<Expr<E, DX>>{ os, e, "" };
+}
+
+
+template <typename A>
+auto operator<<(PrintProxy<A> p, char c) {
+    p.suffix += c;
+    
+    return p;
+}
+
+
+template <typename A>
+auto operator<<(PrintProxy<A> p, const char* s) {
+    p.suffix += s;
+    
+    return p;
+}
+
+
+template <typename A>
+struct FilterProxy {
+    A e;
+    int div;
+    int comp;
+
+    bool operator()(double v) const {
+        return ((int) e(v)) % div == comp;
+    }
+};
+
+
+template <typename E, typename DX>
+auto operator%(Expr<E, DX> e, int div) {
+    return FilterProxy<Expr<E, DX>>{ e, div, 0 };
+}
+
+template <typename A>
+auto operator==(FilterProxy<A> f, int comp) {
+    f.comp = comp;
+
+    return f;
 }
