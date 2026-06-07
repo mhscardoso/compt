@@ -1,20 +1,8 @@
 // Banca de Testes
 
-#include <map>
-#include <cmath>
 #include <tuple>
-#include <vector>
-#include <memory>
-#include <sstream>
-#include <variant>
-#include <utility>
 #include <functional>
-#include <type_traits>
-#include <initializer_list>
-
 #include <iostream>
-#include <algorithm>
-#include <array>
 
 #include "lib.h"
 
