@@ -1,17 +1,10 @@
-#pragma once
-#include <iostream>
 #include <memory>
-#include <map>
-#include <string>
-#include <functional>
 
 using namespace std;
 
 class Var {
 public:
-    // =========================================================
-    // Classe de erro
-    // =========================================================
+
     class Erro {
     public:
         Erro(string msg) : msg(msg) {}
@@ -20,9 +13,7 @@ public:
         string msg;
     };
 
-    // =========================================================
     // Hierarquia de tipos — declarada DENTRO de Var
-    // =========================================================
     class Undefined {
     public:
         virtual ~Undefined() = default;
@@ -94,7 +85,6 @@ public:
         Var divDouble(double x) const override { return n == 0 ? Var() : Var(x / (double)n); }
         Var ltInt    (int    x) const override { return Var(x < n);                          }
         Var ltDouble (double x) const override { return Var(x < (double)n);                  }
-        // String de 1 char + Int: soma ASCII (o 'n' aqui e o valor do Int do lado direito)
         Var addString(const string& x) const override {
             if (x.size() == 1) return Var((int)(unsigned char)x[0] + n);
             return Var();
@@ -116,29 +106,28 @@ public:
         void print(ostream& o) const override { o << n; }
         bool toBool() const override { return n != 0.0; }
 
-        Var add (const Var& b) const override { return b.valor->addDouble(n);    }
-        Var sub (const Var& b) const override { return b.valor->subDouble(n);    }
-        Var mul (const Var& b) const override { return b.valor->mulDouble(n);    }
-        Var div (const Var& b) const override { return b.valor->divDouble(n);    }
-        Var lt  (const Var& b) const override { return b.valor->ltDouble(n);     }
-        Var neg ()             const override { return Var(-n);                   }
-        Var addInt   (int    x) const override { return Var((double)x + n); }
-        Var addDouble(double x) const override { return Var(x + n);          }
-        Var subInt   (int    x) const override { return Var((double)x - n); }
-        Var subDouble(double x) const override { return Var(x - n);          }
-        Var mulInt   (int    x) const override { return Var((double)x * n); }
-        Var mulDouble(double x) const override { return Var(x * n);          }
+        Var add (const Var& b)  const override { return b.valor->addDouble(n);   }
+        Var sub (const Var& b)  const override { return b.valor->subDouble(n);   }
+        Var mul (const Var& b)  const override { return b.valor->mulDouble(n);   }
+        Var div (const Var& b)  const override { return b.valor->divDouble(n);   }
+        Var lt  (const Var& b)  const override { return b.valor->ltDouble(n);    }
+        Var neg ()              const override { return Var(-n);                 }
+        Var addInt   (int    x) const override { return Var((double)x + n);      }
+        Var addDouble(double x) const override { return Var(x + n);              }
+        Var subInt   (int    x) const override { return Var((double)x - n);      }
+        Var subDouble(double x) const override { return Var(x - n);              }
+        Var mulInt   (int    x) const override { return Var((double)x * n);      }
+        Var mulDouble(double x) const override { return Var(x * n);              }
+        Var ltDouble (double x) const override { return Var(x < n);              }
+        Var ltInt    (int    x) const override { return Var((double)x < n);      }
+
         Var divInt   (int    x) const override { return n == 0 ? Var() : Var((double)x / n); }
-        Var divDouble(double x) const override { return n == 0 ? Var() : Var(x / n);          }
-        Var ltInt    (int    x) const override { return Var((double)x < n); }
-        Var ltDouble (double x) const override { return Var(x < n);          }
+        Var divDouble(double x) const override { return n == 0 ? Var() : Var(x / n);         }
     private:
         double n;
     };
 
-    // =========================================================
     // String
-    // =========================================================
     class String : public Undefined {
     public:
         String(const string& s) : s(s) {}
@@ -165,9 +154,7 @@ public:
         string s;
     };
 
-    // =========================================================
     // Boolean
-    // =========================================================
     class Boolean : public Undefined {
     public:
         Boolean(bool b) : b(b) {}
@@ -181,9 +168,8 @@ public:
         bool b;
     };
 
-    // =========================================================
+
     // Object  (map<string, Var>)
-    // =========================================================
     class Object : public Undefined {
     public:
         Object() = default;
@@ -225,7 +211,7 @@ public:
     Var(int n)           : valor(make_shared<Int>(n))                {}
     Var(double n)        : valor(make_shared<Double>(n))             {}
     Var(bool b)          : valor(make_shared<Boolean>(b))            {}
-    Var(char c)          : valor(make_shared<String>(string(1, c)))  {}   // 'X' -> "X"
+    Var(char c)          : valor(make_shared<String>(string(1, c)))  {}
     Var(const char* s)   : valor(make_shared<String>(string(s)))     {}
     Var(const string& s) : valor(make_shared<String>(s))             {}
 
@@ -266,18 +252,16 @@ public:
         return *this;
     }
 
-    // =========================================================
+
     // Factory de Object
-    // =========================================================
     static Var newObject() {
         Var v;
         v.valor = make_shared<Object>();
         return v;
     }
 
-    // =========================================================
+
     // Acesso a atributos: a["key"]  e  a->*"key"
-    // =========================================================
     Var& operator[](const string& key)       { return valor->attr(key); }
     const Var& operator[](const string& key) const { return valor->attr(key); }
     Var& operator[](const char* key)         { return valor->attr(string(key)); }
@@ -285,25 +269,22 @@ public:
     Var& operator->*(const char* key)        { return valor->attr(string(key)); }
     Var& operator->*(const string& key)      { return valor->attr(key); }
 
-    // =========================================================
+
     // Chamada de função: a(b)
-    // =========================================================
     Var operator()(Var arg) const { return valor->call(arg); }
 
-    // =========================================================
+
     // Impressão
-    // =========================================================
     void print(ostream& o) const { valor->print(o); }
 
-    // =========================================================
+
     // Operadores aritméticos e lógicos
-    // =========================================================
-    Var operator+(const Var& b) const { return valor->add(b);  }
-    Var operator-(const Var& b) const { return valor->sub(b);  }
-    Var operator*(const Var& b) const { return valor->mul(b);  }
-    Var operator/(const Var& b) const { return valor->div(b);  }
-    Var operator<(const Var& b) const { return valor->lt(b);   }
-    Var operator!()             const { return valor->neg();    }
+    Var operator+(const Var& b)  const { return valor->add(b);  }
+    Var operator-(const Var& b)  const { return valor->sub(b);  }
+    Var operator*(const Var& b)  const { return valor->mul(b);  }
+    Var operator/(const Var& b)  const { return valor->div(b);  }
+    Var operator<(const Var& b)  const { return valor->lt(b);   }
+    Var operator!()              const { return valor->neg();   }
     Var operator&&(const Var& b) const { return valor->land(b); }
     Var operator||(const Var& b) const { return valor->lor(b);  }
 
@@ -318,48 +299,45 @@ private:
     shared_ptr<Undefined> valor;
 };
 
-// =========================================================
+
 // operator<< global
-// =========================================================
 inline ostream& operator<<(ostream& o, const Var& v) {
     v.print(o);
     return o;
 }
 
-// =========================================================
+
 // Operadores globais: primitivo OP Var
 // Converte o lado esquerdo em Var e reutiliza os operadores
 // de membro — zero duplicação de lógica.
-// =========================================================
-inline Var operator+ (int         a, const Var& b) { return Var(a) + b; }
-inline Var operator- (int         a, const Var& b) { return Var(a) - b; }
-inline Var operator* (int         a, const Var& b) { return Var(a) * b; }
-inline Var operator/ (int         a, const Var& b) { return Var(a) / b; }
-inline Var operator< (int         a, const Var& b) { return Var(a) < b; }
-inline Var operator> (int         a, const Var& b) { return Var(a) > b; }
+inline Var operator+ (int         a, const Var& b) { return Var(a) + b;  }
+inline Var operator- (int         a, const Var& b) { return Var(a) - b;  }
+inline Var operator* (int         a, const Var& b) { return Var(a) * b;  }
+inline Var operator/ (int         a, const Var& b) { return Var(a) / b;  }
+inline Var operator< (int         a, const Var& b) { return Var(a) < b;  }
+inline Var operator> (int         a, const Var& b) { return Var(a) > b;  }
 inline Var operator<=(int         a, const Var& b) { return Var(a) <= b; }
 inline Var operator>=(int         a, const Var& b) { return Var(a) >= b; }
 inline Var operator==(int         a, const Var& b) { return Var(a) == b; }
 inline Var operator!=(int         a, const Var& b) { return Var(a) != b; }
-inline Var operator+ (double      a, const Var& b) { return Var(a) + b; }
-inline Var operator- (double      a, const Var& b) { return Var(a) - b; }
-inline Var operator* (double      a, const Var& b) { return Var(a) * b; }
-inline Var operator/ (double      a, const Var& b) { return Var(a) / b; }
-inline Var operator< (double      a, const Var& b) { return Var(a) < b; }
-inline Var operator> (double      a, const Var& b) { return Var(a) > b; }
+inline Var operator+ (double      a, const Var& b) { return Var(a) + b;  }
+inline Var operator- (double      a, const Var& b) { return Var(a) - b;  }
+inline Var operator* (double      a, const Var& b) { return Var(a) * b;  }
+inline Var operator/ (double      a, const Var& b) { return Var(a) / b;  }
+inline Var operator< (double      a, const Var& b) { return Var(a) < b;  }
+inline Var operator> (double      a, const Var& b) { return Var(a) > b;  }
 inline Var operator<=(double      a, const Var& b) { return Var(a) <= b; }
 inline Var operator>=(double      a, const Var& b) { return Var(a) >= b; }
 inline Var operator==(double      a, const Var& b) { return Var(a) == b; }
 inline Var operator!=(double      a, const Var& b) { return Var(a) != b; }
-inline Var operator+ (const char* a, const Var& b) { return Var(a) + b; }
-inline Var operator< (const char* a, const Var& b) { return Var(a) < b; }
-inline Var operator> (const char* a, const Var& b) { return Var(a) > b; }
+inline Var operator+ (const char* a, const Var& b) { return Var(a) + b;  }
+inline Var operator< (const char* a, const Var& b) { return Var(a) < b;  }
+inline Var operator> (const char* a, const Var& b) { return Var(a) > b;  }
 inline Var operator<=(const char* a, const Var& b) { return Var(a) <= b; }
 inline Var operator>=(const char* a, const Var& b) { return Var(a) >= b; }
 inline Var operator==(const char* a, const Var& b) { return Var(a) == b; }
 inline Var operator!=(const char* a, const Var& b) { return Var(a) != b; }
 
-// =========================================================
+
 // newObject() livre — confortável no main
-// =========================================================
 inline Var newObject() { return Var::newObject(); }
