@@ -1,0 +1,1 @@
+# Objeto com tipo variável
